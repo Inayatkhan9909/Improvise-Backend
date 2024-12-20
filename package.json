@@ -1,0 +1,30 @@
+{
+  "name": "improvise_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase": "^11.1.0",
+    "firebase-admin": "^13.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.12",
+    "nodemon": "^3.1.9"
+  }
+}
