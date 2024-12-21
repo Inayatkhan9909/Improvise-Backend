@@ -6,7 +6,6 @@ import ConnectDb from "../../Config/db";
 
 export const Login = async (req: Request, res: Response) => {
     const { token } = req.body;
-
     try {
         if (!token) {
             return res.status(400).json({ message: "Authentication token is required." });

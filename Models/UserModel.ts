@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
+  firebaseUid: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   contact: { type: String },
@@ -8,6 +9,7 @@ const userSchema = new Schema({
   dob: { type: Date },
   gender: { type: String, enum: ["male", "female", "other"] },
   profilePic: { type: String },
+  isVerified: { type: Boolean, default: false }, 
   roleDetails: {
     student: {
       enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],

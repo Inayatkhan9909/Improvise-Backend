@@ -7,6 +7,6 @@ const router = express.Router();
 
 // Signup Route
 router.post("/signup",upload.single("profilePic"), Signup);
-router.get("/login",Login);
+router.post("/login",Login);
 
 export default router;
