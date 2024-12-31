@@ -9,7 +9,8 @@ const userSchema = new Schema({
   dob: { type: Date },
   gender: { type: String, enum: ["male", "female", "other"] },
   profilePic: { type: String },
-  isVerified: { type: Boolean, default: false }, 
+  isVerified: { type: Boolean, default: false },
+  isAdmin:{type:Boolean,default:false},
   roleDetails: {
     student: {
       enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],

@@ -2,9 +2,12 @@ import { Request, Response } from "express";
 import UserModel from "../../Models/UserModel";
 import { firebaseAuth } from "../../Config/firebaseConfig";
 import ConnectDb from "../../Config/db";
+import jwt from 'jsonwebtoken'
+require('dotenv').config();
 
 
 export const Login = async (req: Request, res: Response) => {
+    const secretKey = process.env.JWT_SECRET || "";
     const { token } = req.body;
     try {
         if (!token) {
@@ -21,8 +24,12 @@ export const Login = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "User not found in the database." });
         }
 
+        const jwttoken = await jwt.sign(
+            { id: user._id, isAdmin: user.isAdmin },
+            secretKey
+        )
         
-        return res.status(200).json({ message: "Login successful!", user });
+        return res.status(201).cookie("access_token", token, { sameSite: 'none' }).json({ message: "Login successful!", user });
     } catch (error) {
         console.error("Login Error:", error);
         const err = error as Error;

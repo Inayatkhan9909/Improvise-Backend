@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 const router = express.Router();
-app.use("/user", authRoutes);
+app.use("/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

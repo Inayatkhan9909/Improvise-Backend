@@ -6,8 +6,16 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import transporter from "../../Config/nodemailerConfig";
 
 export const Signup = async (req: Request, res: Response) => {
-    const { email, password, name, contact, role, dob, gender, profilePic } = req.body;
+    const { email, password, name, contact, role, dob, gender } = req.body;
     try {
+        console.log(req)
+        console.log(req.body.name)
+        console.log(req.body.email)
+        console.log(req.body.password)
+        console.log(req.body.contact)
+        console.log(req.body.role)
+        console.log(req.body.dob)
+        console.log(req.body.gender)
         if (!email || !password || !name || !contact || !role || !dob || !gender) {
             return res.status(400).json({ message: 'All credentials are required!' });
         }
@@ -18,14 +26,14 @@ export const Signup = async (req: Request, res: Response) => {
         if (existingUserDb) {
             return res.status(400).json({ message: 'Email is already registered!' });
         }
-        let profilePicUrl = null;
+        // let profilePicUrl = null;
 
-        if (profilePic) {
-            const storage = getStorage();
-            const storageRef = ref(storage, `profilePics/${Date.now()}_${profilePic.originalname}`);
-            await uploadBytes(storageRef, profilePic.buffer);
-            profilePicUrl = await getDownloadURL(storageRef);
-        }
+        // if (profilePic) {
+        //     const storage = getStorage();
+        //     const storageRef = ref(storage, `profilePics/${Date.now()}_${profilePic.originalname}`);
+        //     await uploadBytes(storageRef, profilePic.buffer);
+        //     profilePicUrl = await getDownloadURL(storageRef);
+        // }
 
         if (password.length < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters containing mix characters.' });
@@ -67,7 +75,6 @@ export const Signup = async (req: Request, res: Response) => {
             role,
             dob,
             gender,
-            profileimage: profilePicUrl,
         });
 
         await user.save();
