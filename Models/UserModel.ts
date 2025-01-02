@@ -9,7 +9,6 @@ interface User extends Document {
   dob?: Date;
   gender?: "male" | "female" | "other";
   profilePic?: string;
-  isVerified?: boolean;
   isAdmin?: boolean;
   roleDetails?: {
     student?: {
@@ -51,7 +50,6 @@ const userSchema = new Schema<User>({
       }
     },
   },
-  isVerified: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
   roleDetails: {
     student: {
