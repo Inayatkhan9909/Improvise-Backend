@@ -4,10 +4,10 @@ import { Request, Response } from "express";
 // Create a new class
 export const createClass = async (req:Request, res:Response) => {
   try {
-    const {instructor, title, description, date, duration, price, maxStudents, category, level, thumbnail } =
+    const {instructor, title, description, date,timing, duration, price, maxStudents, category, level, thumbnail } =
       req.body;
 
-      if(!instructor || !title || !description || !date || !duration || !price || !maxStudents || !category || !level || !thumbnail ){
+      if(!instructor || !title || !description || !date || !timing || !duration || !price || !maxStudents || !category || !level || !thumbnail ){
         return res.status(400).json({ message: 'All credentials are required!' });
       }
 
@@ -16,6 +16,7 @@ export const createClass = async (req:Request, res:Response) => {
       description,
       instructor, 
       date,
+      timing,
       duration,
       price,
       maxStudents,

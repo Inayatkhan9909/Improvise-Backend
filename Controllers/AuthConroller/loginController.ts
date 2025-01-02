@@ -15,7 +15,7 @@ export const Login = async (req: Request, res: Response) => {
         const decodedToken = await firebaseAuth.verifyIdToken(token);
         const { uid } = decodedToken;
 
-       await ConnectDb();
+        await ConnectDb();
         const user = await UserModel.findOne({ firebaseUid: uid });
 
         if (!user) {
