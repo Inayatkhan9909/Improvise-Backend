@@ -1,79 +1,67 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface User extends Document {
-  firebaseUid: string;
-  email: string;
+interface IUser extends Document {
   name: string;
-  contact?: string;
-  role: string[];
-  dob?: Date;
-  gender?: "male" | "female" | "other";
-  profilePic?: string;
-  isAdmin?: boolean;
-  roleDetails?: {
-    student?: {
-      enrolledCourses?: Schema.Types.ObjectId[];
-      bookings?: Schema.Types.ObjectId[];
-    };
+  email: string;
+  password: string;
+  role: "student" | "instructor" | "admin";
+  roleDetails: {
     instructor?: {
-      subjects?: string[];
+      profilePic?: string;
       bio?: string;
-      availability?: {
-        day: string;
-        slots: string[];
+      approvedByAdmin: { type: Boolean, default: false };
+      classesCreated: {
+        classId: mongoose.Types.ObjectId;
+        title: string;
+        date: string;
+        timing: string;
+        maxStudents: number;
+        category: string;
+        level: string;
+        thumbnail: string;
       }[];
-      approvedByAdmin?: boolean;
-      coursesCreated?: Schema.Types.ObjectId[];
+    };
+    student?: {
+      enrolledClasses: mongoose.Types.ObjectId[];
     };
   };
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-const userSchema = new Schema<User>({
-  firebaseUid: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  contact: { type: String },
-  role: { type: [String], enum: ["student", "instructor", "admin"], required: true },
-  dob: { type: Date },
-  gender: { type: String, enum: ["male", "female", "other"] },
-  profilePic: { 
-    type: String,
-    default: function (this: User) {
-      if (this.gender === "male") {
-        return "https://cloud.appwrite.io/v1/storage/buckets/677416fc001f1378c00d/files/677417160009f1f2f607/view?project=677416c4002f86bd0e17&project=677416c4002f86bd0e17&mode=admin";
-      } else if (this.gender === "female") {
-        return "https://cloud.appwrite.io/v1/storage/buckets/677416fc001f1378c00d/files/677417530004c18adf84/view?project=677416c4002f86bd0e17&project=677416c4002f86bd0e17&mode=admin";
-      } else {
-        return "https://cloud.appwrite.io/v1/storage/buckets/677416fc001f1378c00d/files/6774191d001f6dc31578/view?project=677416c4002f86bd0e17&project=677416c4002f86bd0e17&mode=admin";
-      }
-    },
-  },
-  isAdmin: { type: Boolean, default: false },
-  roleDetails: {
-    student: {
-      enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
-      bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
-    },
-    instructor: {
-      subjects: [String],
-      bio: String,
-      availability: {
-        type: [
+const UserSchema: Schema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["student", "instructor", "admin"], required: true },
+    roleDetails: {
+      instructor: {
+        profilePic: { type: String },
+        bio: { type: String },
+        approvedByAdmin: { type: Boolean, default: false },
+        classesCreated: [
           {
-            day: String,
-            slots: [String],
+            classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
+            title: { type: String, required: true },
+            date: { type: String, required: true },
+            timing: { type: String, required: true },
+            maxStudents: { type: Number, required: true },
+            category: { type: String, required: true },
+            level: { type: String, required: true },
+            thumbnail: { type: String, required: true },
           },
         ],
-        default: [],
+        
       },
-      approvedByAdmin: { type: Boolean, default: false },
-      coursesCreated: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+      student: {
+        enrolledClasses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
+      },
     },
   },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+  { timestamps: true }
+);
 
-export default model<User>("User", userSchema);
+const User = mongoose.model<IUser>("User", UserSchema);
+
+export default User;
+
+ 

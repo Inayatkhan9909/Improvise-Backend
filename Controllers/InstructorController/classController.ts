@@ -1,17 +1,47 @@
-const Class = require('../../Models/ClassesModel');
+
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+import User from "../../Models/UserModel";
+import Class from "../../Models/ClassesModel";
 
 // Create a new class
 export const createClass = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const { title, description, date, timing, duration, maxStudents, category, level, thumbnail } =
-      req.body;
-    const instructor = req.body.user._id
-    console.log("instructorId " + instructor)
-    if (!instructor || !title || !description || !date || !timing || !duration || !maxStudents || !category || !level || !thumbnail) {
-      return res.status(400).json({ message: 'All credentials are required!' });
+    const {
+      title,
+      description,
+      date,
+      timing,
+      duration,
+      maxStudents,
+      category,
+      level,
+      thumbnail,
+    } = req.body;
+    const instructor = req.body.user._id;
+
+    if (
+      !title ||
+      !description ||
+      !date ||
+      !timing ||
+      !duration ||
+      !maxStudents ||
+      !category ||
+      !level ||
+      !thumbnail
+    ) {
+      return res.status(400).json({ message: "All credentials are required!" });
     }
 
+    if (!instructor) {
+      return res.status(400).json({ message: "Invalid Instructor!" });
+    }
+
+    // Create new class document
     const newClass = new Class({
       title,
       description,
@@ -25,13 +55,51 @@ export const createClass = async (req: Request, res: Response) => {
       thumbnail,
     });
 
-    await newClass.save();
-    res.status(201).json({ success: true, message: 'Class created successfully', class: newClass });
+    // Save the class in the database
+    const savedClass = await newClass.save({ session });
+
+    // Update instructor details in the User collection
+    const updatedInstructor = await User.findByIdAndUpdate(
+      instructor,
+      {
+        $push: {
+          "roleDetails.instructor.classesCreated": {
+            classId: savedClass._id,
+            title: savedClass.title,
+            date: savedClass.date,
+            timing: savedClass.timing,
+            maxStudents: savedClass.maxStudents,
+            category: savedClass.category,
+            level: savedClass.level,
+            thumbnail: savedClass.thumbnail,
+          },
+        },
+      },
+      { new: true, session }
+    );
+
+    if (!updatedInstructor) {
+      throw new Error("Failed to update instructor details");
+    }
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      success: true,
+      message: "Class created successfully",
+      class: savedClass,
+      instructor: updatedInstructor,
+    });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to create class' });
+    res.status(500).json({ success: false, message: "Failed to create class" });
   }
 };
+
 
 // Fetch all classes
 export const getAllClasses = async (req: Request, res: Response) => {

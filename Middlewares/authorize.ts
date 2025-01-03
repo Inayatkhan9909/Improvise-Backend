@@ -18,15 +18,21 @@ export const authorized = async (req: Request, res: Response, next: NextFunction
             return res.status(401).json({ message: "InstructorId is required." });
         }
 
-        const isInstructor = isUser.role.includes('instructor');
+        const isInstructor = isUser?.role?.includes('instructor');
         if (!isInstructor) {
             return res.status(403).json({ message: "User is not an instructor." });
         }
-             req.body.user = isUser;
+        console.log(isUser)
+        if (!isUser.roleDetails?.instructor?.approvedByAdmin) {
+            return res.status(403).json({ message: "Instructor is not approved by admin." });
+        }
+
+
+        req.body.user = isUser;
         next();
 
     } catch (error) {
-        console.error(error); 
+        console.error(error);
         return res.status(500).json({ message: "Internal server error." });
     }
 }
