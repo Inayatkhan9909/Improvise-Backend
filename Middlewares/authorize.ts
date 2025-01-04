@@ -27,7 +27,6 @@ export const authorized = async (req: Request, res: Response, next: NextFunction
             return res.status(403).json({ message: "Instructor is not approved by admin." });
         }
 
-
         req.body.user = isUser;
         next();
 
