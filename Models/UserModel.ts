@@ -11,8 +11,10 @@ interface IUser extends Document {
   isAdmin: Boolean;
   roleDetails: {
     instructor?: {
-
       bio?: string;
+      qualifications: { type: String}, 
+      resume: { type: String }, 
+      skills: [{ type: String }],
       approvedByAdmin: { type: Boolean, default: false };
       classesCreated: {
         classId: mongoose.Types.ObjectId;
@@ -57,6 +59,9 @@ const UserSchema = new Schema<IUser>(
     roleDetails: {
       instructor: {
         bio: { type: String },
+        qualifications: { type: String}, 
+        resume: { type: String }, 
+        skills: [{ type: String }],
         approvedByAdmin: { type: Boolean, default: false },
         classesCreated: [
           {

@@ -1,8 +1,9 @@
 
 import { Request, Response } from "express";
-import mongoose from "mongoose";
+import mongoose, { connect } from "mongoose";
 import User from "../../Models/UserModel";
 import Class from "../../Models/ClassesModel";
+import ConnectDb from "../../Config/db";
 
 // Create a new class
 export const createClass = async (req: Request, res: Response) => {
@@ -22,6 +23,8 @@ export const createClass = async (req: Request, res: Response) => {
       thumbnail,
     } = req.body;
     const instructor = req.body.user._id;
+    const instructorname = req.body.user.name;
+    const instructorprofile = req.body.profilePic;
 
     if (
       !title ||
@@ -40,12 +43,14 @@ export const createClass = async (req: Request, res: Response) => {
     if (!instructor) {
       return res.status(400).json({ message: "Invalid Instructor!" });
     }
-
+    await ConnectDb();
     // Create new class document
     const newClass = new Class({
       title,
       description,
       instructor,
+      instructorname,
+      instructorprofile,
       date,
       timing,
       duration,

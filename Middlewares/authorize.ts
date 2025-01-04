@@ -12,7 +12,7 @@ export const authorized = async (req: Request, res: Response, next: NextFunction
     try {
         const instructorId = token.split(' ')[1];
         await ConnectDb();
-
+        
         const isUser = await User.findById(instructorId)
         if (!isUser) {
             return res.status(401).json({ message: "InstructorId is required." });

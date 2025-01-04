@@ -17,6 +17,13 @@ const classSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
+        instructorname:{
+         type:String,
+     
+        },
+        instructorprofile:{
+            type:String
+        },
         date: {
             type: Date,
             required: true,
