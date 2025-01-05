@@ -15,7 +15,7 @@ interface IUser extends Document {
       qualifications: { type: String}, 
       resume: { type: String }, 
       skills: [{ type: String }],
-      approvedByAdmin: { type: Boolean, default: false };
+      approvedByAdmin:  Boolean;
       classesCreated: {
         classId: mongoose.Types.ObjectId;
         title: string;
