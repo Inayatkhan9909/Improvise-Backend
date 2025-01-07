@@ -4,7 +4,7 @@ interface IUser extends Document {
   firebaseUid: String;
   name: string;
   email: string;
-  role: "student" | "instructor" | "admin";
+  role: "student" | "instructor";
   dob: Date;
   gender: String;
   profilePic: string;
@@ -40,7 +40,7 @@ const UserSchema = new Schema<IUser>(
     firebaseUid: { type: String, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    role: { type: String, enum: ["student", "instructor", "admin"], required: true },
+    role: { type: String, enum: ["student", "instructor"], required: true },
     dob: { type: Date },
     gender: { type: String, enum: ["male", "female", "other"] },
     isAdmin: { type: Boolean, default: false },
