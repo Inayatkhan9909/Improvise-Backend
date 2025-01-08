@@ -9,6 +9,7 @@ interface IUser extends Document {
   gender: String;
   profilePic: string;
   isAdmin: Boolean;
+  contact:Number;
   roleDetails: {
     instructor?: {
       bio?: string;
@@ -44,6 +45,7 @@ const UserSchema = new Schema<IUser>(
     dob: { type: Date },
     gender: { type: String, enum: ["male", "female", "other"] },
     isAdmin: { type: Boolean, default: false },
+    contact:{type:Number,required:true,unique:true},
     profilePic: {
       type: String,
       default: function (this: IUser) {
