@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from "express"
 
 import User from "../Models/UserModel";
 import ConnectDb from "../Config/db";
+import { messaging } from "firebase-admin";
 
 
 export const isInstructor = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-    console.log(token)
     if (!token) {
         return res.status(401).json({ message: "InstructorId is required." });
     }
@@ -61,6 +61,31 @@ export const isApprovedInstructor = async (req: Request, res: Response, next: Ne
 
     } catch (error) {
         console.error(error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+}
+
+
+export const isAdminUser = async (req: Request, res: Response, next: NextFunction) =>{
+    const token = req.headers.authorization;
+    if (!token) {
+        return res.status(401).json({ message: "Admin id" });
+    }
+    try {
+        const instructorId = token.split(' ')[1];
+        await ConnectDb();
+
+        const isUser = await User.findById(instructorId)
+        if (!isUser) {
+            return res.status(401).json({ message: "adminId is required." });
+        }
+        if(!isUser.isAdmin){
+            return res.status(401).json({message:"Unauthorized"})
+        }
+        next();
+    }
+    catch(error){
+        console.log(error);
         return res.status(500).json({ message: "Internal server error." });
     }
 }

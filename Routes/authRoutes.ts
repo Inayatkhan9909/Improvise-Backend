@@ -2,11 +2,11 @@ import express from "express";
 import { Signup } from "../Controllers/AuthConroller/signupController";
 import { Login } from "../Controllers/AuthConroller/loginController"
 import { autheticate } from "../Middlewares/authenticate";
-import { editUserDetails } from "../Controllers/AuthConroller/EditUserDetailsController";
 import { editUserEmail } from "../Controllers/AuthConroller/editUserEmailController";
 import { editUserPassword } from "../Controllers/AuthConroller/editUserPasswordController";
 import { editUserProfilePic } from "../Controllers/AuthConroller/editUserProfilePicController";
 import { deleteUser } from "../Controllers/AuthConroller/deleteUsercontroller";
+import { editUserDetails } from "../Controllers/AuthConroller/editUserDetailsController";
 
 
 const router = express.Router();

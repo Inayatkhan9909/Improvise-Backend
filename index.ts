@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import authRoutes from "./Routes/authRoutes";
 import instructorRoutes from './Routes/instructorRoutes'
 import classRoutes from './Routes/classRoutes'
+import adminRoutes from './Routes/adminRoutes'
 import cors from "cors"
 
 dotenv.config();
@@ -19,6 +20,7 @@ const router = express.Router();
 app.use("/auth", authRoutes);
 app.use("/instructor",instructorRoutes)
 app.use('/classes',classRoutes)
+app.use("/admin",adminRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
