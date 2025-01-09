@@ -5,6 +5,7 @@ import { firebaseAuth } from "../Config/firebaseConfig";
 
 
 export const autheticate = async (req: Request, res: Response, next: NextFunction) => {
+
     const token = req.headers.authorization;
     if (!token) {
         return res.status(401).json({ message: "InstructorId is required." });
