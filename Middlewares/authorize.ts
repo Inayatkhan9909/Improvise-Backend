@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express"
 import User from "../Models/UserModel";
 import ConnectDb from "../Config/db";
 import { messaging } from "firebase-admin";
+import { firebaseAuth } from "../Config/firebaseConfig";
 
 
 export const isInstructor = async (req: Request, res: Response, next: NextFunction) => {
@@ -72,11 +73,13 @@ export const isAdminUser = async (req: Request, res: Response, next: NextFunctio
         return res.status(401).json({ message: "Admin id" });
     }
     try {
-        const instructorId = token.split(' ')[1];
-        await ConnectDb();
+        const adminId = token.split(' ')[1];
+        const decodedToken = await firebaseAuth.verifyIdToken(adminId);
+        const { uid } = decodedToken;
+        await ConnectDb(); 
 
-        const isUser = await User.findById(instructorId)
-        if (!isUser) {
+        const isUser = await User.findOne({firebaseUid:uid})
+        if(!isUser) {
             return res.status(401).json({ message: "adminId is required." });
         }
         if(!isUser.isAdmin){
