@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import User from "../../Models/UserModel";
+import UserModel from "../../Models/UserModel";
 import { firebaseAuth } from "../../Config/firebaseConfig";
 import ConnectDb from "../../Config/db";
 require('dotenv').config();
@@ -7,7 +7,6 @@ require('dotenv').config();
 
 export const Login = async (req: Request, res: Response) => {
     const { token } = req.body;
-    
     try {
         if (!token) {
             return res.status(400).json({ message: "Authentication token is required." });
@@ -17,7 +16,7 @@ export const Login = async (req: Request, res: Response) => {
         const { uid } = decodedToken;
 
         await ConnectDb();
-        const user = await User.findOne({ firebaseUid: uid });
+        const user = await UserModel.findOne({ firebaseUid: uid });
 
         if (!user) {
             return res.status(404).json({ message: "User not found in the database." });

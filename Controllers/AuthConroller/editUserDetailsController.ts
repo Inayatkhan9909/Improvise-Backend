@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../Models/UserModel";
+import ConnectDb from "../../Config/db";
 
 
 export const editUserDetails = async (req: Request, res: Response) => {
@@ -14,6 +15,7 @@ export const editUserDetails = async (req: Request, res: Response) => {
         if (!userId) {
             return res.status(400).json({ message: "UserId not found" });
         }
+        await ConnectDb();
         const isUser = await User.findById(userId);
 
         if (!isUser) {
@@ -29,6 +31,6 @@ export const editUserDetails = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Registration failed.", error });
+        return res.status(500).json({ message: "Update failed.", error });
     }
 }
