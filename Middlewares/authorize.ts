@@ -12,10 +12,11 @@ export const isInstructor = async (req: Request, res: Response, next: NextFuncti
         return res.status(401).json({ message: "InstructorId is required." });
     }
     try {
-        const instructorId = token.split(' ')[1];
+        const instructorToken = token.split(' ')[1];
+        const decodedToken = await firebaseAuth.verifyIdToken(instructorToken);
+        const { uid } = decodedToken;
         await ConnectDb();
-
-        const isUser = await User.findById(instructorId)
+        const isUser = await User.findOne({ firebaseUid: uid })
         if (!isUser) {
             return res.status(401).json({ message: "InstructorId is required." });
         }
@@ -24,7 +25,7 @@ export const isInstructor = async (req: Request, res: Response, next: NextFuncti
         if (!isInstructor) {
             return res.status(403).json({ message: "User is not an instructor." });
         }
-       
+
         req.body.user = isUser;
         next();
 
@@ -36,23 +37,24 @@ export const isInstructor = async (req: Request, res: Response, next: NextFuncti
 
 export const isApprovedInstructor = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-    if (!token) {
-        return res.status(401).json({ message: "InstructorId is required." });
-    }
     try {
-        const instructorId = token.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "InstructorId is required." });
+        }
+        const instructorToken = token.split(' ')[1];
+        const decodedToken = await firebaseAuth.verifyIdToken(instructorToken);
+        const { uid } = decodedToken;
         await ConnectDb();
-        
-        const isUser = await User.findById(instructorId)
+        const isUser = await User.findOne({ firebaseUid: uid })
         if (!isUser) {
             return res.status(401).json({ message: "InstructorId is required." });
         }
-
         const isInstructor = isUser?.role?.includes('instructor');
         if (!isInstructor) {
             return res.status(403).json({ message: "User is not an instructor." });
         }
-       
+
         if (!isUser.roleDetails?.instructor?.approvedByAdmin) {
             return res.status(403).json({ message: "Instructor is not approved by admin." });
         }
@@ -67,7 +69,7 @@ export const isApprovedInstructor = async (req: Request, res: Response, next: Ne
 }
 
 
-export const isAdminUser = async (req: Request, res: Response, next: NextFunction) =>{
+export const isAdminUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
     if (!token) {
         return res.status(401).json({ message: "Admin id" });
@@ -76,18 +78,18 @@ export const isAdminUser = async (req: Request, res: Response, next: NextFunctio
         const adminId = token.split(' ')[1];
         const decodedToken = await firebaseAuth.verifyIdToken(adminId);
         const { uid } = decodedToken;
-        await ConnectDb(); 
+        await ConnectDb();
 
-        const isUser = await User.findOne({firebaseUid:uid})
-        if(!isUser) {
+        const isUser = await User.findOne({ firebaseUid: uid })
+        if (!isUser) {
             return res.status(401).json({ message: "adminId is required." });
         }
-        if(!isUser.isAdmin){
-            return res.status(401).json({message:"Unauthorized"})
+        if (!isUser.isAdmin) {
+            return res.status(401).json({ message: "Unauthorized" })
         }
         next();
     }
-    catch(error){
+    catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error." });
     }

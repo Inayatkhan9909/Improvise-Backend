@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import User from "../../Models/UserModel"; // Adjust the import path as necessary
+import User from "../../Models/UserModel"; 
 import ConnectDb from "../../Config/db";
 
 export const getAllInstructors = async (req: Request, res: Response) => {
