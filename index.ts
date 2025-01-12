@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import authRoutes from "./Routes/authRoutes";
 import instructorRoutes from './Routes/instructorRoutes'
 import classRoutes from './Routes/classRoutes'
-import adminRoutes from './Routes/adminRoutes'
+import adminRoutes from './Routes/adminRoutes';
+import courseRoutes from './Routes/courseRoutes'
 import cors from "cors"
 
 dotenv.config();
@@ -18,9 +19,10 @@ app.use(express.json());
 
 const router = express.Router();
 app.use("/auth", authRoutes);
-app.use("/instructor",instructorRoutes)
-app.use('/classes',classRoutes)
-app.use("/admin",adminRoutes)
+app.use("/instructor",instructorRoutes);
+app.use('/classes',classRoutes);
+app.use("/admin",adminRoutes);
+app.use("/courses",courseRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

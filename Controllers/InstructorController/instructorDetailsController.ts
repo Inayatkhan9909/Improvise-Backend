@@ -37,6 +37,7 @@ export const addInstructorDetails = async (req: Request, res: Response) => {
             skills: parsedSkills,
             approvedByAdmin: isUser.roleDetails?.instructor?.approvedByAdmin || false,
             classesCreated: isUser.roleDetails?.instructor?.classesCreated || [],
+            courseCreated: isUser.roleDetails?.instructor?.courseCreated|| [],
         };
 
         await isUser.save();

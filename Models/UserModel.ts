@@ -27,6 +27,23 @@ interface IUser extends Document {
         level: string;
         thumbnail: string;
       }[];
+      courseCreated: {
+        courseId: mongoose.Types.ObjectId;
+        title: string;
+        date: string;
+        timing: string;
+        price:Number;
+        modules: 
+          {
+              title: String;
+              content: String ;
+              duration: Number ;
+          }[];
+        maxStudents: number;
+        category: string;
+        level: string;
+        thumbnail: string;
+      }[];
     };
     student?: {
       enrolledClasses: mongoose.Types.ObjectId[];
@@ -72,6 +89,26 @@ const UserSchema = new Schema<IUser>(
             date: { type: String, required: true },
             timing: { type: String, required: true },
             maxStudents: { type: Number, required: true },
+            category: { type: String, required: true },
+            level: { type: String, required: true },
+            thumbnail: { type: String, required: true },
+          },
+        ],
+        courseCreated: [
+          {
+            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
+            title: { type: String, required: true },
+            date: { type: String, required: true },
+            timing: { type: String, required: true },
+            maxStudents: { type: Number, required: true },
+            price: { type: Number, required: true },
+            modules: [
+              {
+                  title: { type: String},
+                  content: { type: String },
+                  duration: { type: Number },
+              },
+          ],
             category: { type: String, required: true },
             level: { type: String, required: true },
             thumbnail: { type: String, required: true },
