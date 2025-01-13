@@ -1,8 +1,8 @@
 import express from "express";
 import { isApprovedInstructor } from "../Middlewares/authorize";
-import {createCourse,getAllCourses} from '../Controllers/CoursecControllers/CreateCourse'
-import { deleteCourse } from "../Controllers/CoursecControllers/deleteCourseController";
-import { updateCourse } from "../Controllers/CoursecControllers/updateCourseController";
+import {createCourse,getAllCourses} from '../Controllers/coursesController'
+import { deleteCourse } from "../Controllers/coursesController";
+import { updateCourse } from "../Controllers/coursesController";
 
 const router = express.Router();
 

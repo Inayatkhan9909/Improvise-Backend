@@ -1,12 +1,12 @@
 import express from "express";
-import { Signup } from "../Controllers/AuthConroller/signupController";
-import { Login } from "../Controllers/AuthConroller/loginController"
+import { Signup } from "../Controllers/authController";
+import { Login } from "../Controllers/authController"
 import { autheticate } from "../Middlewares/authenticate";
-import { editUserEmail } from "../Controllers/AuthConroller/editUserEmailController";
-import { editUserPassword } from "../Controllers/AuthConroller/editUserPasswordController";
-import { editUserProfilePic } from "../Controllers/AuthConroller/editUserProfilePicController";
-import { deleteUser } from "../Controllers/AuthConroller/deleteUsercontroller";
-import { editUserDetails } from "../Controllers/AuthConroller/editUserDetailsController";
+import { editUserEmail } from "../Controllers/authController";
+import { editUserPassword } from "../Controllers/authController";
+import { editUserProfilePic } from "../Controllers/authController";
+import { deleteUser } from "../Controllers/authController";
+import { editUserDetails } from "../Controllers/authController";
 
 
 const router = express.Router();

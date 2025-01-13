@@ -1,7 +1,7 @@
 import express from "express";
-import {addInstructorDetails} from '../Controllers/InstructorController/instructorDetailsController'
+import {addInstructorDetails} from '../Controllers/instructorController'
 import { isInstructor } from "../Middlewares/authorize";
-import { getInstructorClasses,getInstructorCourses } from "../Controllers/InstructorController/getInstructorClasses";
+import { getInstructorClasses,getInstructorCourses } from "../Controllers/instructorController";
 
 const router = express.Router();
 

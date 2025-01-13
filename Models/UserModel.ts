@@ -31,7 +31,6 @@ interface IUser extends Document {
         courseId: mongoose.Types.ObjectId;
         title: string;
         date: string;
-        timing: string;
         price:Number;
         modules: 
           {
@@ -100,7 +99,6 @@ const UserSchema = new Schema<IUser>(
             courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
             title: { type: String, required: true },
             date: { type: String, required: true },
-            timing: { type: String, required: true },
             maxStudents: { type: Number, required: true },
             price: { type: Number, required: true },
             modules: [

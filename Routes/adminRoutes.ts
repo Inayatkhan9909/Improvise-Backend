@@ -1,8 +1,8 @@
 import express from "express";
 import {isAdminUser} from '../Middlewares/authorize';
-import {getAllInstructors} from '../Controllers/Admincontrollers/getAllInstructors'
-import { approveInstructor } from "../Controllers/Admincontrollers/approveInstructor";
-import {rejectInstructor} from '../Controllers/Admincontrollers/rejectInstructor'
+import {getAllInstructors} from '../Controllers/adminController'
+import { approveInstructor } from "../Controllers/adminController";
+import {rejectInstructor} from '../Controllers/adminController'
 
 
 const router = express.Router();

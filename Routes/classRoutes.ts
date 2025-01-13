@@ -1,10 +1,10 @@
 import express from "express";
-import { getAllClasses, createClass } from '../Controllers/ClassesController/classController'
+import { getAllClasses, createClass } from '../Controllers/classesController'
 import { isApprovedInstructor } from "../Middlewares/authorize";
-import { updateClass } from "../Controllers/ClassesController/updateClassController";
-import { deleteClass } from "../Controllers/ClassesController/deleteClassController";
+import { updateClass } from "../Controllers/classesController";
+import { deleteClass } from "../Controllers/classesController";
 import { isStudent } from "../Middlewares/authenticate";
-import { BookClass } from "../Controllers/ClassesController/BookClassController";
+import { BookClass } from "../Controllers/classesController";
 
 const router = express.Router();
 
