@@ -47,6 +47,7 @@ interface IUser extends Document {
     };
     student?: {
       enrolledClasses: mongoose.Types.ObjectId[];
+      enrolledCourses: mongoose.Types.ObjectId[];
     };
   };
   createdAt?: Date;
@@ -96,7 +97,7 @@ const UserSchema = new Schema<IUser>(
         ],
         courseCreated: [
           {
-            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
+            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
             title: { type: String, required: true },
             date: { type: String, required: true },
             timing: { type: String, required: true },
@@ -118,6 +119,7 @@ const UserSchema = new Schema<IUser>(
       },
       student: {
         enrolledClasses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
+        enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
       },
     },
     createdAt: { type: Date, default: Date.now },

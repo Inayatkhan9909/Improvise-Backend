@@ -23,7 +23,7 @@ export const createClass = async (req: Request, res: Response) => {
     } = req.body;
     const instructor = req.body.user._id;
     const instructorname = req.body.user.name;
-    const instructorprofile = req.body.profilePic;
+    const instructorprofile = req.body.user.profilePic;
 
     if (
       !title ||

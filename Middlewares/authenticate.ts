@@ -16,9 +16,40 @@ export const autheticate = async (req: Request, res: Response, next: NextFunctio
         const { uid } = decodedToken;
         await ConnectDb();
 
-        const isUser = await User.find({firebaseUid:uid})
+        const isUser = await User.find({ firebaseUid: uid })
         if (!isUser) {
             return res.status(401).json({ message: "User not found" });
+        }
+
+        req.body.user = isUser;
+        next();
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+
+
+}
+export const isStudent = async (req: Request, res: Response, next: NextFunction) => {
+
+    const token = req.headers.authorization;
+    if (!token) {
+        return res.status(401).json({ message: "userId is required." });
+    }
+    try {
+        const userId = token.split(' ')[1];
+        const decodedToken = await firebaseAuth.verifyIdToken(userId);
+        const { uid } = decodedToken;
+        await ConnectDb();
+
+        const isUser = await User.findOne({ firebaseUid: uid })
+        if (!isUser) {
+            return res.status(401).json({ message: "User not found" });
+        }
+        const student = isUser?.role?.includes('student');
+        if (!student) {
+            return res.status(403).json({ message: "User is not an student." });
         }
 
         req.body.user = isUser;
