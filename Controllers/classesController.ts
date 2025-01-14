@@ -164,7 +164,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     if (enrolledStudents.length > 0) {
       const studentEmails = enrolledStudents.map((student: any) => student.email);
       const mailOptions = {
-        from: "your-email@gmail.com",
+        from: process.env.EMAIL,
         to: studentEmails,
         subject: `Class Cancellation Notification: ${classToDelete.title}`,
         html: `
@@ -379,7 +379,7 @@ export const updateClass = async (req: Request, res: Response) => {
       await session.commitTransaction();
   
       const mailOptions = {
-        from: "your-email@example.com", 
+        from: process.env.EMAIL, 
         to: updatedUser.email,
         subject: "Class Booking Confirmation",
         html: `
