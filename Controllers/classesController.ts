@@ -411,3 +411,99 @@ export const updateClass = async (req: Request, res: Response) => {
       session.endSession();
     }
   };
+
+
+  export const getUserBookedClasses = async (req: Request, res: Response) => {
+    try {
+        const userId = await req.body.user._id;
+        if (!userId) {
+            res.status(400).json({ message: "Id not found" });
+        }
+        await ConnectDb();
+        const classes = await Class.find({ enrolledStudents: userId });
+        if (!classes) {
+            res.status(400).json({ message: "Classes not found" });
+        }
+        res.status(200).json({ message: "classes found", classes });
+    } catch (error: any) {
+        console.error("Error updating instructor details:", error);
+        res.status(500).json({ message: "Internal server error.", error: error.message });
+    }
+}
+
+
+export const CancelUserClassBooking = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+
+  try {
+    const { classId } = req.params;
+    const user = req.body?.user;
+    if (!classId || !user) {
+      return res.status(400).json({ message: "Class ID and user details are required!" });
+    }
+
+    await ConnectDb();
+
+    session.startTransaction();
+
+    // Check if the class exists
+    const existingClass = await Class.findById(classId).session(session);
+    if (!existingClass) {
+      return res.status(404).json({ message: "Class not found!" });
+    }
+
+    // Check if the user is enrolled in the class
+    const isEnrolled = existingClass.enrolledStudents.includes(user._id);
+    if (!isEnrolled) {
+      return res.status(400).json({ message: "User is not enrolled in this class." });
+    }
+
+    // Remove user from class's enrolled students
+    existingClass.enrolledStudents = existingClass.enrolledStudents.filter(
+      (studentId: string) => studentId.toString() !== user._id.toString()
+    );
+    await existingClass.save({ session });
+
+    // Remove class from user's enrolled classes
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        $pull: { "roleDetails.student.enrolledClasses": classId },
+      },
+      { new: true, session }
+    );
+
+    if (!updatedUser) {
+      throw new Error("Failed to update user details");
+    }
+
+    // Send cancellation email to the user
+    const mailOptions = {
+      from: "your-email@example.com",
+      to: updatedUser.email,
+      subject: "Class Booking Cancellation",
+      html: `
+        <p>Dear ${updatedUser.name},</p>
+        <p>Your booking for the class <strong>${existingClass.title}</strong> has been successfully canceled.</p>
+        <p>If this was a mistake, feel free to book the class again at your convenience.</p>
+        <p>Best regards,</p>
+        <p>Your Team</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    await session.commitTransaction();
+
+    res.status(200).json({
+      success: true,
+      message: "Class booking canceled successfully and confirmation email sent.",
+    });
+  } catch (error) {
+    console.error(error);
+    await session.abortTransaction();
+    res.status(500).json({ success: false, message: "Failed to cancel class booking", error });
+  } finally {
+    session.endSession();
+  }
+};
