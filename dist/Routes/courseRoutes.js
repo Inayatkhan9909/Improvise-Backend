@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const authorize_1 = require("../Middlewares/authorize");
+const coursesController_1 = require("../Controllers/coursesController");
+const coursesController_2 = require("../Controllers/coursesController");
+const coursesController_3 = require("../Controllers/coursesController");
+const authenticate_1 = require("../Middlewares/authenticate");
+const router = express_1.default.Router();
+router.post("/create-course", authorize_1.isApprovedInstructor, coursesController_1.createCourse);
+router.put("/update-course", authorize_1.isApprovedInstructor, coursesController_3.updateCourse);
+router.delete("/delete-course/:courseId", authorize_1.isApprovedInstructor, coursesController_2.deleteCourse);
+router.get("/getallcourses", coursesController_1.getAllCourses);
+router.put('/bookcourse', authenticate_1.isStudent, coursesController_1.BookCourse);
+router.delete("/cancel-user-coursebooking/:courseId", authenticate_1.isStudent, coursesController_1.CancelUserCourseBooking);
+router.get("/get-userbooked-courses", authenticate_1.isStudent, coursesController_1.getUserBookedCourses);
+exports.default = router;

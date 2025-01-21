@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node index.ts",
-    "start": "node index.js",
-    "build": "tsc"
+    "start": "node ./dist/index.js",
+    "build": "tsc",
+    "stage":"git status && git add . "
   },
   "keywords": [],
   "author": "",
