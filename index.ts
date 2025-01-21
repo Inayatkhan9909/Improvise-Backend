@@ -5,6 +5,7 @@ import instructorRoutes from './Routes/instructorRoutes'
 import classRoutes from './Routes/classRoutes'
 import adminRoutes from './Routes/adminRoutes';
 import courseRoutes from './Routes/courseRoutes'
+import removeUnverifiedUsersJob from './CronJobs/removeUnverifedUsers'
 import cors from "cors"
 
 dotenv.config();
@@ -16,7 +17,7 @@ const PORT = process.env.PORT || 2000;
 app.use(cors());
 app.use(express.json());
 
-
+removeUnverifiedUsersJob();
 const router = express.Router();
 app.use("/auth", authRoutes);
 app.use("/instructor",instructorRoutes);
