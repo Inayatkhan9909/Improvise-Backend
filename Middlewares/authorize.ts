@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express"
-
 import User from "../Models/UserModel";
 import ConnectDb from "../Config/db";
-import { messaging } from "firebase-admin";
 import { firebaseAuth } from "../Config/firebaseConfig";
 
 

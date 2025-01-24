@@ -93,7 +93,7 @@ export const createCourse = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Class created successfully",
       course: savedCourse,

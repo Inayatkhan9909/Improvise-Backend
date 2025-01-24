@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import mongoose, { connect } from "mongoose";
+import mongoose from "mongoose";
 import Class from "../Models/ClassesModel";
 import User from "../Models/UserModel";
 import ConnectDb from "../Config/db";
@@ -91,7 +91,7 @@ export const createClass = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Class created successfully",
       class: savedClass,
