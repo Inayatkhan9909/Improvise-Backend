@@ -106,16 +106,28 @@ export const createClass = async (req: Request, res: Response) => {
 };
 
 
+
 export const getAllClasses = async (req: Request, res: Response) => {
   try {
     await ConnectDb();
-    const classes = await Class.find()
-      .sort({ createdAt: -1 }) 
-      .limit(10); 
+
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const currentDate = new Date();
+
+    const classes = await Class.find({ date: { $gte: currentDate } })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalClasses = await Class.countDocuments({ date: { $gte: currentDate } });
 
     res.status(200).json({
       success: true,
       classes,
+      totalClasses,
+      totalPages: Math.ceil(totalClasses / Number(limit)),
     });
   } catch (error) {
     console.error(error);
@@ -201,11 +213,53 @@ export const deleteClass = async (req: Request, res: Response) => {
 };
 
 export const updateClass = async (req: Request, res: Response) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-      const {
-        classId,
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const {
+      classId,
+      title,
+      description,
+      date,
+      timing,
+      duration,
+      maxStudents,
+      category,
+      level,
+      thumbnail,
+    } = req.body;
+
+    if (!classId) {
+      return res.status(400).json({ message: "Class ID is required!" });
+    }
+
+    if (
+      !title ||
+      !description ||
+      !date ||
+      !timing ||
+      !duration ||
+      !maxStudents ||
+      !category ||
+      !level ||
+      !thumbnail
+    ) {
+      return res.status(400).json({ message: "All credentials are required!" });
+    }
+
+    await ConnectDb();
+
+    // Check if the class exists
+    const existingClass = await Class.findById(classId).session(session);
+    if (!existingClass) {
+      return res.status(404).json({ message: "Class not found!" });
+    }
+
+    const originalClass = { ...existingClass._doc };
+
+    const updatedClass = await Class.findByIdAndUpdate(
+      classId,
+      {
         title,
         description,
         date,
@@ -215,92 +269,50 @@ export const updateClass = async (req: Request, res: Response) => {
         category,
         level,
         thumbnail,
-      } = req.body;
-  
-      if (!classId) {
-        return res.status(400).json({ message: "Class ID is required!" });
-      }
-  
-      if (
-        !title ||
-        !description ||
-        !date ||
-        !timing ||
-        !duration ||
-        !maxStudents ||
-        !category ||
-        !level ||
-        !thumbnail
-      ) {
-        return res.status(400).json({ message: "All credentials are required!" });
-      }
-  
-      await ConnectDb();
-  
-      // Check if the class exists
-      const existingClass = await Class.findById(classId).session(session);
-      if (!existingClass) {
-        return res.status(404).json({ message: "Class not found!" });
-      }
-  
-      const originalClass = { ...existingClass._doc };
-  
-      const updatedClass = await Class.findByIdAndUpdate(
-        classId,
-        {
-          title,
-          description,
-          date,
-          timing,
-          duration,
-          maxStudents,
-          category,
-          level,
-          thumbnail,
-        },
-        { new: true, session }
-      );
-  
-      if (!updatedClass) {
-        throw new Error("Failed to update class details");
-      }
-  
-      // Update instructor's class details
-      const instructorId = updatedClass.instructor;
-      const updatedInstructor = await User.findByIdAndUpdate(
-        instructorId,
-        {
-          $set: {
-            "roleDetails.instructor.classesCreated.$[class]": {
-              classId: updatedClass._id,
-              title: updatedClass.title,
-              date: updatedClass.date,
-              timing: updatedClass.timing,
-              maxStudents: updatedClass.maxStudents,
-              category: updatedClass.category,
-              level: updatedClass.level,
-              thumbnail: updatedClass.thumbnail,
-            },
+      },
+      { new: true, session }
+    );
+
+    if (!updatedClass) {
+      throw new Error("Failed to update class details");
+    }
+
+    // Update instructor's class details
+    const instructorId = updatedClass.instructor;
+    const updatedInstructor = await User.findByIdAndUpdate(
+      instructorId,
+      {
+        $set: {
+          "roleDetails.instructor.classesCreated.$[class]": {
+            classId: updatedClass._id,
+            title: updatedClass.title,
+            date: updatedClass.date,
+            timing: updatedClass.timing,
+            maxStudents: updatedClass.maxStudents,
+            category: updatedClass.category,
+            level: updatedClass.level,
+            thumbnail: updatedClass.thumbnail,
           },
         },
-        {
-          new: true,
-          arrayFilters: [{ "class.classId": classId }],
-          session,
-        }
-      );
-  
-      if (!updatedInstructor) {
-        throw new Error("Failed to update instructor details");
+      },
+      {
+        new: true,
+        arrayFilters: [{ "class.classId": classId }],
+        session,
       }
-  
-      if (originalClass.bookedStudents && originalClass.bookedStudents.length > 0) {
-  
-        const mailOptions = {
-          from: "your-email@gmail.com",
-          to: originalClass.bookedStudents.map((student: any) => student.email), // Get emails of all booked students
-          subject: `Class Update: ${title}`,
-          html: `
+    );
+
+    if (!updatedInstructor) {
+      throw new Error("Failed to update instructor details");
+    }
+
+    if (originalClass.bookedStudents && originalClass.bookedStudents.length > 0) {
+
+      const mailOptions = {
+        from: "your-email@gmail.com",
+        to: originalClass.bookedStudents.map((student: any) => student.email), // Get emails of all booked students
+        subject: `Class Update: ${title}`,
+        html: `
             <p>Dear Student,</p>
             <p>The class you booked has been updated. Below are the updated details:</p>
             <ul>
@@ -315,74 +327,74 @@ export const updateClass = async (req: Request, res: Response) => {
             <p>Please check the updated details in your dashboard.</p>
             <p>Best regards,<br>Your Team</p>
           `,
-        }; 
-  
-        await transporter.sendMail(mailOptions);
-      }
-  
-      await session.commitTransaction();
-      session.endSession();
-  
-      res.status(200).json({
-        success: true,
-        message: "Class updated successfully",
-        updatedClass,
-      });
-     
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      console.error(error);
-      res.status(500).json({ success: false, message: "Failed to update class" });
-    }
-  };
+      };
 
-  export const BookClass = async (req: Request, res: Response) => {
-    const session = await mongoose.startSession();
-  
-    try {
-      const { classId } = req.body;
-      const user = req.body?.user;
-  
-      if (!classId || !user) {
-        return res.status(400).json({ message: "Class ID and user details are required!" });
-      }
-  
-      await ConnectDb();
-  
-      session.startTransaction();
-  
-      const existingClass = await Class.findById(classId).session(session);
-      if (!existingClass) {
-        return res.status(404).json({ message: "Class not found!" });
-      }
-  
-      if (existingClass.enrolledStudents.includes(user._id)) {
-        return res.status(400).json({ message: "User is already enrolled in this class." });
-      }
-  
-      existingClass.enrolledStudents.push(user._id);
-      await existingClass.save({ session });
-  
-      const updatedUser = await User.findByIdAndUpdate(
-        user._id,
-        {
-          $push: { "roleDetails.student.enrolledClasses": classId },
-        },
-        { new: true, session }
-      );
-  
-      if (!updatedUser) {
-        throw new Error("Failed to update user details");
-      }
-  
-      await session.commitTransaction();
-  
-      const mailOptions = {
-        from: process.env.EMAIL, 
-        to: updatedUser.email,
-        subject: "Class Booking Confirmation",
-        html: `
+      await transporter.sendMail(mailOptions);
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      message: "Class updated successfully",
+      updatedClass,
+    });
+
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to update class" });
+  }
+};
+
+export const BookClass = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+
+  try {
+    const { classId } = req.body;
+    const user = req.body?.user;
+
+    if (!classId || !user) {
+      return res.status(400).json({ message: "Class ID and user details are required!" });
+    }
+
+    await ConnectDb();
+
+    session.startTransaction();
+
+    const existingClass = await Class.findById(classId).session(session);
+    if (!existingClass) {
+      return res.status(404).json({ message: "Class not found!" });
+    }
+
+    if (existingClass.enrolledStudents.includes(user._id)) {
+      return res.status(400).json({ message: "User is already enrolled in this class." });
+    }
+
+    existingClass.enrolledStudents.push(user._id);
+    await existingClass.save({ session });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        $push: { "roleDetails.student.enrolledClasses": classId },
+      },
+      { new: true, session }
+    );
+
+    if (!updatedUser) {
+      throw new Error("Failed to update user details");
+    }
+
+    await session.commitTransaction();
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: updatedUser.email,
+      subject: "Class Booking Confirmation",
+      html: `
           <p>Dear ${updatedUser.name},</p>
           <p>Thank you for booking a class!</p>
           <p>Here are the details of your booking:</p>
@@ -395,40 +407,40 @@ export const updateClass = async (req: Request, res: Response) => {
           <p>Best regards,</p>
           <p>Your Team</p>
         `,
-      };
-  
-      await transporter.sendMail(mailOptions);
-  
-      res.status(200).json({
-        success: true,
-        message: "Class booked successfully and confirmation email sent.",
-      });
-    } catch (error) {
-      console.error(error);
-      await session.abortTransaction();
-      res.status(500).json({ success: false, message: "Failed to book class", error: error});
-    } finally {
-      session.endSession();
-    }
-  };
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "Class booked successfully and confirmation email sent.",
+    });
+  } catch (error) {
+    console.error(error);
+    await session.abortTransaction();
+    res.status(500).json({ success: false, message: "Failed to book class", error: error });
+  } finally {
+    session.endSession();
+  }
+};
 
 
-  export const getUserBookedClasses = async (req: Request, res: Response) => {
-    try {
-        const userId = await req.body.user._id;
-        if (!userId) {
-            res.status(400).json({ message: "Id not found" });
-        }
-        await ConnectDb();
-        const classes = await Class.find({ enrolledStudents: userId });
-        if (!classes) {
-            res.status(400).json({ message: "Classes not found" });
-        }
-        res.status(200).json({ message: "classes found", classes });
-    } catch (error: any) {
-        console.error("Error updating instructor details:", error);
-        res.status(500).json({ message: "Internal server error.", error: error.message });
+export const getUserBookedClasses = async (req: Request, res: Response) => {
+  try {
+    const userId = await req.body.user._id;
+    if (!userId) {
+      res.status(400).json({ message: "Id not found" });
     }
+    await ConnectDb();
+    const classes = await Class.find({ enrolledStudents: userId });
+    if (!classes) {
+      res.status(400).json({ message: "Classes not found" });
+    }
+    res.status(200).json({ message: "classes found", classes });
+  } catch (error: any) {
+    console.error("Error updating instructor details:", error);
+    res.status(500).json({ message: "Internal server error.", error: error.message });
+  }
 }
 
 
