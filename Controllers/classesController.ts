@@ -105,29 +105,16 @@ export const createClass = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const getAllClasses = async (req: Request, res: Response) => {
   try {
     await ConnectDb();
-
-    const { page = 1, limit = 10 } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
-
-    const currentDate = new Date();
-
-    const classes = await Class.find({ date: { $gte: currentDate } })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(Number(limit));
-
-    const totalClasses = await Class.countDocuments({ date: { $gte: currentDate } });
+    const classes = await Class.find()
+      .sort({ createdAt: -1 }) 
+      .limit(10); 
 
     res.status(200).json({
       success: true,
       classes,
-      totalClasses,
-      totalPages: Math.ceil(totalClasses / Number(limit)),
     });
   } catch (error) {
     console.error(error);
