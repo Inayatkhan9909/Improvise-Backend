@@ -128,9 +128,11 @@ export const getAllCourses = async (req: Request, res: Response) => {
 
 export const getTopCourses = async (req: Request, res: Response) => {
   try {
+    await ConnectDb();
     const courses = await Course.find().sort({ createdAt: -1 }).limit(3);
     res.status(200).json({ success: true, courses });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
