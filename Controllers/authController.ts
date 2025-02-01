@@ -63,7 +63,7 @@ export const Signup = async (req: Request, res: Response) => {
         });
 
         await user.save();
-        return res.status(200).json({ message: "User registered successfully!", user });
+        return res.status(201).json({ message: "User registered successfully!", user });
     } catch (error) {
         console.error(error);
         const err = error as Error;
@@ -90,7 +90,7 @@ export const Login = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "User not found in the database." });
         }
 
-        return res.status(200).json({ message: "Login successful!", user });
+        return res.status(201).json({ message: "Login successful!", user });
     } catch (error) {
         console.error("Login Error:", error);
         const err = error as Error;
@@ -118,7 +118,7 @@ export const editUserProfilePic = async(req:Request,res:Response)=>{
          isUser.profilePic = profilePic;
  
          await isUser.save();
-         return res.status(200).json({ message: "User Updated", user: isUser })
+         return res.status(201).json({ message: "User Updated", user: isUser })
  
      } catch (error) {
          console.log(error);
@@ -145,7 +145,7 @@ export const editUserProfilePic = async(req:Request,res:Response)=>{
         // Update password
         await firebaseAuth.updateUser(firebaseUser.uid, { password: newPassword });
 
-        return res.status(200).json({ message: "Password updated successfully." });
+        return res.status(201).json({ message: "Password updated successfully." });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Password update failed.", error });
@@ -243,7 +243,7 @@ export const editUserDetails = async (req: Request, res: Response) => {
         isUser.contact = contact;
 
         await isUser.save();
-        return res.status(200).json({ message: "User Updated", user: isUser })
+        return res.status(201).json({ message: "User Updated", user: isUser })
 
     } catch (error) {
         console.error(error);
@@ -268,7 +268,7 @@ export const deleteUser = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "User not found in MongoDB" });
         }
 
-        return res.status(200).json({ message: "User successfully deleted from both Firebase and MongoDB" });
+        return res.status(201).json({ message: "User successfully deleted from both Firebase and MongoDB" });
     } catch (error) {
         console.error("Error deleting user:", error);
         return res.status(500).json({ message: "Internal server error", error });
