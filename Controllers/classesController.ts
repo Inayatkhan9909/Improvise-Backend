@@ -91,7 +91,7 @@ export const createClass = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class created successfully",
       class: savedClass,
@@ -112,7 +112,7 @@ export const getAllClasses = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 }) 
       .limit(10); 
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       classes,
     });
@@ -184,7 +184,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class deleted successfully",
     });
@@ -322,7 +322,7 @@ export const updateClass = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class updated successfully",
       updatedClass,
@@ -398,7 +398,7 @@ export const BookClass = async (req: Request, res: Response) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class booked successfully and confirmation email sent.",
     });
@@ -423,7 +423,7 @@ export const getUserBookedClasses = async (req: Request, res: Response) => {
     if (!classes) {
       res.status(400).json({ message: "Classes not found" });
     }
-    res.status(200).json({ message: "classes found", classes });
+    res.status(201).json({ message: "classes found", classes });
   } catch (error: any) {
     console.error("Error updating instructor details:", error);
     res.status(500).json({ message: "Internal server error.", error: error.message });
@@ -494,7 +494,7 @@ export const CancelUserClassBooking = async (req: Request, res: Response) => {
 
     await session.commitTransaction();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class booking canceled successfully and confirmation email sent.",
     });
