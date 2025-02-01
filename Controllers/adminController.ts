@@ -31,7 +31,7 @@ export const approveInstructor = async (req: Request, res: Response) => {
                 `,
             };   
             await transporter.sendMail(mailOptions);
-            return res.status(200).json({ message: "Instructor approved successfully." });
+            return res.status(201).json({ message: "Instructor approved successfully." });
         } else {
             return res.status(400).json({ message: "Instructor role details not found." });
         }
@@ -51,7 +51,7 @@ export const getAllInstructors = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "No instructors found." });
         }
 
-        return res.status(200).json(instructors);
+        return res.status(201).json(instructors);
     } catch (error) {
         console.error("Error fetching instructors:", error);
         return res.status(500).json({ message: "Internal server error." });
@@ -93,7 +93,7 @@ export const rejectInstructor = async (req: Request, res: Response) => {
                 `,
             };   
             await transporter.sendMail(mailOptions);
-            return res.status(200).json({ message: "Instructor approved successfully." });
+            return res.status(201).json({ message: "Instructor approved successfully." });
         } else {
             return res.status(400).json({ message: "Instructor role details not found." });
         }
