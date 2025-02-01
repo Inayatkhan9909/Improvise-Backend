@@ -93,7 +93,7 @@ export const createCourse = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class created successfully",
       course: savedCourse,
@@ -115,7 +115,7 @@ export const getAllCourses = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 })
       .limit(10);
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       courses,
     });
@@ -130,7 +130,7 @@ export const getTopCourses = async (req: Request, res: Response) => {
   try {
     await ConnectDb();
     const courses = await Course.find().sort({ createdAt: -1 }).limit(3);
-    res.status(200).json({ success: true, courses });
+    res.status(201).json({ success: true, courses });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, error: "Server error" });
@@ -198,7 +198,7 @@ export const deleteCourse = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Class deleted successfully",
     });
@@ -339,7 +339,7 @@ export const updateCourse = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Course updated successfully",
       updatedCourse,
@@ -415,7 +415,7 @@ export const BookCourse = async (req: Request, res: Response) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Course booked successfully and confirmation email sent.",
     });
@@ -440,7 +440,7 @@ export const getUserBookedCourses = async (req: Request, res: Response) => {
     if (!courses) {
       res.status(400).json({ message: "Courses not found" });
     }
-    res.status(200).json({ message: "courses found", courses });
+    res.status(201).json({ message: "courses found", courses });
   } catch (error: any) {
     console.error("Error updating instructor details:", error);
     res.status(500).json({ message: "Internal server error.", error: error.message });
@@ -511,7 +511,7 @@ export const CancelUserCourseBooking = async (req: Request, res: Response) => {
 
     await session.commitTransaction();
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Course booking canceled successfully and confirmation email sent.",
     });
